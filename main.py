@@ -15,13 +15,11 @@ def click(event):
 		display['state'] = tk.NORMAL
 		display.delete(0, tk.END)
 		display.insert(tk.END, event.widget["text"])
-		print(display.get())
 		display['state'] = tk.DISABLED
 		equals_clicked = 0
 	else:
 		display['state'] = tk.NORMAL
 		display.insert(tk.END, event.widget["text"])
-		print(display.get())
 		display['state'] = tk.DISABLED
 
 def calculate(event):
