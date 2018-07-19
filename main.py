@@ -35,12 +35,28 @@ def calculate(event):
 		clear()
 
 	else:
-		answer = eval(display.get())
-		display['state'] = tk.NORMAL
-		display.delete(0, tk.END)
-		display.insert(0, answer)
-		display['state']= tk.DISABLED
-		equals_clicked = 1
+		#catch error so that code should not break
+		try:	
+			answer = eval(display.get())
+			display['state'] = tk.NORMAL
+			display.delete(0, tk.END)
+			display.insert(0, answer)
+			display['state']= tk.DISABLED
+			equals_clicked = 1
+
+		#show error output on the screen
+		except Exception as e:
+			display['state'] = tk.NORMAL
+			display.delete(0, tk.END)
+			display.insert(0, e)
+			display['state']= tk.DISABLED
+			equals_clicked = 1
+
+
+
+
+		
+		
 
 def clear(event = None):
 	display['state'] = tk.NORMAL
