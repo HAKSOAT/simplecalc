@@ -1,11 +1,19 @@
 import tkinter as tk
 from tkinter import messagebox
+import os
+from storage import Database
 
 window = tk.Tk()
 
-window.maxsize(215, 250)
-window.minsize(215, 250)
+window.maxsize(215, 270)
+window.minsize(215, 270)
 window.title("Simple Calc")
+
+if "calc_records.sqlite3" in os.listdir("."):
+	database = Database()
+else:
+	database = Database()
+	database.create()
 
 equals_clicked = 0
 
@@ -116,5 +124,19 @@ button_equals.bind('<Button-1>', calculate)
 button_clear = tk.Button(window, text = "Clear")
 button_clear.grid(column = 1, columnspan = 2, row = 6, sticky = tk.N+tk.S+tk.E+tk.W, pady = 8)
 button_clear.bind('<Button-1>', clear)
+
+main_menu = tk.Menu(window)
+window.configure(menu = main_menu)
+
+tools_menu = tk.Menu(main_menu)
+main_menu.add_cascade(label = 'Tools', menu = tools_menu)
+
+history = tk.Menu(tools_menu)
+tools_menu.add_cascade(label = 'History', menu = history)
+history.add_command(label = 'One')
+history.add_command(label = "Two")
+history.add_command(label = "Three")
+history.add_command(label = "Four")
+history.add_command(label = "Five")
 
 window.mainloop()
