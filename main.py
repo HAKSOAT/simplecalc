@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 import os
 from storage import Database
+import time
 
 window = tk.Tk()
 
@@ -11,6 +12,7 @@ window.title("Simple Calc")
 
 if "calc_records.sqlite3" in os.listdir("."):
 	database = Database()
+	database.connect()
 else:
 	database = Database()
 	database.create()
@@ -44,6 +46,11 @@ def calculate(event):
 
 	else:
 		answer = eval(display.get())
+		max_history = 10
+		if database.check_size() > max_history:
+			database.delete()
+		database.add(display.get(), time.time())
+		database.commit()
 		display['state'] = tk.NORMAL
 		display.delete(0, tk.END)
 		display.insert(0, answer)
@@ -54,7 +61,69 @@ def clear(event = None):
 	display['state'] = tk.NORMAL
 	display.delete(0, tk.END)
 	display['state']= tk.DISABLED
-	
+
+
+class History_Interface():
+
+	def __init__(self, database):
+		self.label_one = False
+		self.label_two = False
+		self.label_three = False
+		self.label_four = False
+		self.label_five = False
+		self.database = database
+
+	def one(self):
+		self.label_one = True
+		self.check_history()
+
+	def two(self):
+		self.label_two = True
+		self.check_history()
+
+	def three(self):
+		self.label_three = True
+		self.check_history()
+
+	def four(self):
+		self.label_four = True
+		self.check_history()
+
+	def five(self):
+		self.label_five = True
+		self.check_history()
+
+	def check_history(self):
+		if self.label_one == True:
+			display['state'] = tk.NORMAL
+			display.delete(0, tk.END)
+			display.insert(0, self.database.query(0))
+			display['state']= tk.DISABLED
+			self.label_one = False
+		elif self.label_two == True:
+			display['state'] = tk.NORMAL
+			display.delete(0, tk.END)
+			display.insert(0, self.database.query(1))
+			display['state']= tk.DISABLED
+			self.label_two = False
+		elif self.label_three == True:
+			display['state'] = tk.NORMAL
+			display.delete(0, tk.END)
+			display.insert(0, self.database.query(2))
+			display['state']= tk.DISABLED
+			self.label_three = False
+		elif self.label_four == True:
+			display['state'] = tk.NORMAL
+			display.delete(0, tk.END)
+			display.insert(0, self.database.query(3))
+			display['state']= tk.DISABLED
+			self.label_four = False
+		elif self.label_five == True:
+			display['state'] = tk.NORMAL
+			display.delete(0, tk.END)
+			display.insert(0, self.database.query(4))
+			display['state']= tk.DISABLED
+			self.label_five = False
 
 
 v = tk.StringVar()
@@ -132,11 +201,13 @@ tools_menu = tk.Menu(main_menu)
 main_menu.add_cascade(label = 'Tools', menu = tools_menu)
 
 history = tk.Menu(tools_menu)
+interface = History_Interface(database)
 tools_menu.add_cascade(label = 'History', menu = history)
-history.add_command(label = 'One')
-history.add_command(label = "Two")
-history.add_command(label = "Three")
-history.add_command(label = "Four")
-history.add_command(label = "Five")
+history.add_command(label = 'One', command = interface.one)
+history.add_command(label = "Two", command = interface.two)
+history.add_command(label = "Three", command = interface.three)
+history.add_command(label = "Four", command = interface.four)
+history.add_command(label = "Five", command = interface.five)
 
 window.mainloop()
+database.close()
