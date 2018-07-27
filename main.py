@@ -46,26 +46,26 @@ def calculate(event):
 
 	else:
 		#catch error so that code should not break
-		try:	
-			answer = eval(display.get())
-      max_history = 10
-      if database.check_size() > max_history:
-        database.delete()
-      database.add(display.get(), time.time())
-      database.commit()
-      display['state'] = tk.NORMAL
-      display.delete(0, tk.END)
-      display.insert(0, answer)
-      display['state']= tk.DISABLED
-      equals_clicked = 1
-
-		#show error output on the screen
-		except Exception as e:
-			display['state'] = tk.NORMAL
-			display.delete(0, tk.END)
-			display.insert(0, e)
-			display['state']= tk.DISABLED
-			equals_clicked = 1
+        try:	
+          answer = eval(display.get())
+          max_history = 10
+          if database.check_size() > max_history:
+            database.delete()
+          database.add(display.get(), time.time())
+          database.commit()
+          display['state'] = tk.NORMAL
+          display.delete(0, tk.END)
+          display.insert(0, answer)
+          display['state']= tk.DISABLED
+          equals_clicked = 1
+        
+            #show error output on the screen
+        except Exception as e:
+            display['state'] = tk.NORMAL
+            display.delete(0, tk.END)
+            display.insert(0, e)
+            display['state']= tk.DISABLED
+            equals_clicked = 1
 
 
 def clear(event = None):
