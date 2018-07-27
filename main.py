@@ -1,11 +1,21 @@
 import tkinter as tk
 from tkinter import messagebox
+import os
+from storage import Database
+import time
 
 window = tk.Tk()
 
-window.maxsize(215, 250)
-window.minsize(215, 250)
+window.maxsize(215, 270)
+window.minsize(215, 270)
 window.title("Simple Calc")
+
+if "calc_records.sqlite3" in os.listdir("."):
+	database = Database()
+	database.connect()
+else:
+	database = Database()
+	database.create()
 
 equals_clicked = 0
 
@@ -38,11 +48,16 @@ def calculate(event):
 		#catch error so that code should not break
 		try:	
 			answer = eval(display.get())
-			display['state'] = tk.NORMAL
-			display.delete(0, tk.END)
-			display.insert(0, answer)
-			display['state']= tk.DISABLED
-			equals_clicked = 1
+      max_history = 10
+      if database.check_size() > max_history:
+        database.delete()
+      database.add(display.get(), time.time())
+      database.commit()
+      display['state'] = tk.NORMAL
+      display.delete(0, tk.END)
+      display.insert(0, answer)
+      display['state']= tk.DISABLED
+      equals_clicked = 1
 
 		#show error output on the screen
 		except Exception as e:
@@ -53,16 +68,73 @@ def calculate(event):
 			equals_clicked = 1
 
 
-
-
-		
-		
-
 def clear(event = None):
 	display['state'] = tk.NORMAL
 	display.delete(0, tk.END)
 	display['state']= tk.DISABLED
-	
+
+
+class History_Interface():
+
+	def __init__(self, database):
+		self.label_one = False
+		self.label_two = False
+		self.label_three = False
+		self.label_four = False
+		self.label_five = False
+		self.database = database
+
+	def one(self):
+		self.label_one = True
+		self.check_history()
+
+	def two(self):
+		self.label_two = True
+		self.check_history()
+
+	def three(self):
+		self.label_three = True
+		self.check_history()
+
+	def four(self):
+		self.label_four = True
+		self.check_history()
+
+	def five(self):
+		self.label_five = True
+		self.check_history()
+
+	def check_history(self):
+		if self.label_one == True:
+			display['state'] = tk.NORMAL
+			display.delete(0, tk.END)
+			display.insert(0, self.database.query(0))
+			display['state']= tk.DISABLED
+			self.label_one = False
+		elif self.label_two == True:
+			display['state'] = tk.NORMAL
+			display.delete(0, tk.END)
+			display.insert(0, self.database.query(1))
+			display['state']= tk.DISABLED
+			self.label_two = False
+		elif self.label_three == True:
+			display['state'] = tk.NORMAL
+			display.delete(0, tk.END)
+			display.insert(0, self.database.query(2))
+			display['state']= tk.DISABLED
+			self.label_three = False
+		elif self.label_four == True:
+			display['state'] = tk.NORMAL
+			display.delete(0, tk.END)
+			display.insert(0, self.database.query(3))
+			display['state']= tk.DISABLED
+			self.label_four = False
+		elif self.label_five == True:
+			display['state'] = tk.NORMAL
+			display.delete(0, tk.END)
+			display.insert(0, self.database.query(4))
+			display['state']= tk.DISABLED
+			self.label_five = False
 
 
 v = tk.StringVar()
@@ -133,4 +205,20 @@ button_clear = tk.Button(window, text = "Clear")
 button_clear.grid(column = 1, columnspan = 2, row = 6, sticky = tk.N+tk.S+tk.E+tk.W, pady = 8)
 button_clear.bind('<Button-1>', clear)
 
+main_menu = tk.Menu(window)
+window.configure(menu = main_menu)
+
+tools_menu = tk.Menu(main_menu)
+main_menu.add_cascade(label = 'Tools', menu = tools_menu)
+
+history = tk.Menu(tools_menu)
+interface = History_Interface(database)
+tools_menu.add_cascade(label = 'History', menu = history)
+history.add_command(label = 'One', command = interface.one)
+history.add_command(label = "Two", command = interface.two)
+history.add_command(label = "Three", command = interface.three)
+history.add_command(label = "Four", command = interface.four)
+history.add_command(label = "Five", command = interface.five)
+
 window.mainloop()
+database.close()
